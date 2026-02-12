@@ -1,0 +1,18 @@
+## IntelliJ
+.idea
+
+backend/Thumbs.db
+backend/.DS_Store
+
+backend/.gradle
+backend/build/
+backend/target/
+backend/out/
+backend/.micronaut/
+*.iml
+*.ipr
+*.iws
+.project
+.settings
+.classpath
+.factorypath
