@@ -8,6 +8,10 @@ import java.util.Scanner;
 @RequiredArgsConstructor
 public class Task5 implements Task {
 
+    private static final int TIMEOUT_MS = 10000;
+    private static final int MIN_PORT = 1;
+    private static final int MAX_PORT = 65535;
+
     private final String host;
     private final int startPort;
     private final int endPort;
@@ -21,8 +25,7 @@ public class Task5 implements Task {
         for (int port = startPort; port <= endPort && running; port++) {
             try (Socket socket = new Socket(host, port)) {
                 System.out.println("Port " + port + " is open");
-            } catch (Exception _) {
-            }
+            } catch (Exception ignored) {}
         }
 
         if (running) {
@@ -36,32 +39,45 @@ public class Task5 implements Task {
         System.out.println("Scanning stopped");
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Enter host: ");
-        String host = scanner.nextLine();
-
-        System.out.print("Start port: ");
-        int startPort = scanner.nextInt();
-
-        System.out.print("Final port: ");
-        int endPort = scanner.nextInt();
-
-        Task5 task = new Task5(host, startPort, endPort);
-
-        // Запускаем сканирование в отдельном потоке
-        Thread thread = new Thread(task::start);
-        thread.start();
-
-        // Останавливаем через 10 секунд если не завершилось
+    public static void run(Scanner scanner) {
         try {
-            thread.join(10000);
-            if (thread.isAlive()) {
-                task.stop();
+            System.out.print("Enter host: ");
+            String host = scanner.nextLine().trim();
+            if (host.isEmpty()) {
+                System.out.println("Error: host cannot be empty.");
+                return;
             }
-        } catch (InterruptedException e) {
-            task.stop();
+
+            System.out.print("Start port: ");
+            int startPort = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.print("Final port: ");
+            int endPort = Integer.parseInt(scanner.nextLine().trim());
+
+            if (startPort < MIN_PORT || endPort > MAX_PORT || startPort > endPort) {
+                System.out.println("Error: ports must be between " + MIN_PORT + " and "
+                        + MAX_PORT + ", start port must be <= end port.");
+                return;
+            }
+
+            Task5 task = new Task5(host, startPort, endPort);
+            Thread thread = new Thread(task::start);
+            thread.start();
+
+            try {
+                thread.join(TIMEOUT_MS);
+                if (thread.isAlive()) {
+                    task.stop();
+                }
+            } catch (InterruptedException e) {
+                task.stop();
+                System.out.println("Error: scanning interrupted.");
+                System.out.println(e.getMessage());
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Error: invalid port. Please enter an integer.");
+            System.out.println(e.getMessage());
         }
     }
 }

@@ -4,31 +4,43 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Task1 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+
+    private static final int RANDOM_MIN = -100;
+    private static final int RANDOM_MAX = 100;
+    private static final int RANDOM_RANGE = RANDOM_MAX - RANDOM_MIN + 1;
+
+    public static void run(Scanner scanner) {
         System.out.print("Input size of array: ");
-        int n = scanner.nextInt();
-
-        int[] array = new int[n];
-        Random random = new Random();
-
-        for (int i = 0; i < n; i++) {
-            array[i] = random.nextInt(201) - 100;
-        }
-
-        System.out.print("Array: ");
-        for (int num : array) {
-            System.out.print(num + " ");
-        }
-        System.out.println();
-
-        int sum = 0;
-        for (int num : array) {
-            if (num > 0) {
-                sum += num;
+        try {
+            int n = Integer.parseInt(scanner.nextLine().trim());
+            if (n <= 0) {
+                System.out.println("Error: array size must be a positive number.");
+                return;
             }
-        }
 
-        System.out.println("Sum of positive elements: " + sum);
+            int[] array = new int[n];
+            Random random = new Random();
+            for (int i = 0; i < n; i++) {
+                array[i] = random.nextInt(RANDOM_RANGE) + RANDOM_MIN;
+            }
+
+            System.out.print("Array: ");
+            for (int num : array) {
+                System.out.print(num + " ");
+            }
+            System.out.println();
+
+            int sum = 0;
+            for (int num : array) {
+                if (num > 0) {
+                    sum += num;
+                }
+            }
+            System.out.println("Sum of positive elements: " + sum);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Error: invalid input. Please enter an integer.");
+            System.out.println(e.getMessage());
+        }
     }
 }

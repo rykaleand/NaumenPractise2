@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "ru.calorai"
+group = "ru.nau"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -19,4 +19,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "ru.nau.Main"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
